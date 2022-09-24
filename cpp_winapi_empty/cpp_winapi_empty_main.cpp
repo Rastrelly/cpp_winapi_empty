@@ -14,9 +14,9 @@ const TCHAR CLSNAME[] = TEXT("ourWinClass");
 
 //global identifiers
 HWND hwnd; //window variable
-HWND edit1, edit2, edit3;
-HWND panel1;
-HWND button1;
+HWND edit1, edit2, edit3; //text blocks
+HWND panel1; //drawing panel
+HWND button1;//execution button
 
 //global vars
 std::vector<float> results = {};
@@ -54,7 +54,6 @@ int APIENTRY WinMain(
 	WNDCLASSEX wc = { }; //winow class
 	MSG msg;             //window message  
 	
-
 	wc.cbSize = sizeof(wc);
 	wc.style = 0;
 	wc.lpfnWndProc = winproc;
@@ -76,22 +75,20 @@ int APIENTRY WinMain(
 		return 0;
 	}
 
-	//створюємо вікно та записуємо у змінну hwnd
+	//create a window and write to hwnd variable
 	hwnd = CreateWindowEx(
-		WS_EX_LEFT,			//розширений стиль вікна
-		CLSNAME,			//назва класу вікна
-		"Window Name",		//заголовок вікна
-		WS_OVERLAPPEDWINDOW,//стиль вікна
-		10,					//координата Х лівого верхнього 	
-							//кута
-		15,					//координата У лівого верхніого 
-							//кута
-		800,				//ширина
-		600,				//висота
-		NULL,				//"батьківське" вікно
-		NULL,				//індекс меню HMENU
-		hInst,				//посилання на інстанс додатку
-		NULL);				//параметр повідомлення WM_CREATE
+		WS_EX_LEFT,			//window style extended
+		CLSNAME,			//window class name
+		"Window Name",		//window header
+		WS_OVERLAPPEDWINDOW,//window style
+		10,					//top left corner X coord 	
+		15,					//top left corner Y coord
+		800,				//width
+		600,				//height
+		NULL,				//parent window
+		NULL,				//HMENU index
+		hInst,				//instance ref
+		NULL);				//WM_CREATE parameter
 	if (!hwnd) {
 		MessageBox(NULL, TEXT("Could not create window"),
 			NULL, MB_ICONERROR);
@@ -144,13 +141,16 @@ LRESULT CALLBACK winproc(HWND hwnd, UINT wm, WPARAM wp,	LPARAM lp)
 {
 	switch (wm)
 	{
-	case WM_COMMAND:
+	case WM_COMMAND: //fires when command action executed
+		//(like moyuse click over a button)
 	{
-		if (LOWORD(wp) == BUTTON1)
+		if (LOWORD(wp) == BUTTON1) //wp defines HMENU index 
+									//of WM_COMMAND recipient
 		{
 			char ed1txt[2048] = "";
 			char ed2txt[2048] = "";
 
+			//extract text data of window
 			GetWindowText(edit1, ed1txt, 2048);
 			GetWindowText(edit2, ed2txt, 2048);
 
@@ -162,16 +162,20 @@ LRESULT CALLBACK winproc(HWND hwnd, UINT wm, WPARAM wp,	LPARAM lp)
 			
 			std::string res_str = "Result = " + std::to_string(res);
 
+			//redefines text of a window
 			SetWindowText(edit3,res_str.c_str());
 
+			//forces WM_PAINT message execution
 			RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 		}
 		break;
 	}
 
-	case WM_PAINT:
+	case WM_PAINT: //fires when the window needs to be redrawn
+		//(mostly on resizes, but we force it in WM_COMMAND)
 	{
 		PAINTSTRUCT ps;
+		//creates draw context and starts painting mode for it
 		HDC hdc = BeginPaint(panel1, &ps);
 
 		// All painting occurs here, between BeginPaint and EndPaint.
@@ -200,6 +204,8 @@ LRESULT CALLBACK winproc(HWND hwnd, UINT wm, WPARAM wp,	LPARAM lp)
 			Polyline(hdc, rpoints, results.size());
 			delete(rpoints);
 		}		
+
+		//destroys paint context
 		EndPaint(hwnd, &ps);
 		break;
 	}
