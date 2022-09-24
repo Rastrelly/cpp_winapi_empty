@@ -1,6 +1,4 @@
 #include <windows.h>
-#define UNICODE
-#define _UNICODE
 #include <tchar.h>
 #include <string>
 #include <vector>
