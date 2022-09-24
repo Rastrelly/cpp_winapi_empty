@@ -26,7 +26,7 @@ std::vector<float> results = {};
 //forward declaration of message processor
 LRESULT CALLBACK winproc(HWND hwnd, UINT wm, WPARAM wp, LPARAM lp);
 
-float getresmax()
+float getResMax()
 {
 	float max = results[0];
 	for (float a : results)
@@ -34,6 +34,16 @@ float getresmax()
 		if (a > max) max = a;
 	}
 	return max;
+}
+
+float getResMin()
+{
+	float min = results[0];
+	for (float a : results)
+	{
+		if (a < min) min = a;
+	}
+	return min;
 }
 
 int APIENTRY WinMain(
@@ -171,7 +181,8 @@ LRESULT CALLBACK winproc(HWND hwnd, UINT wm, WPARAM wp,	LPARAM lp)
 
 		if (results.size() > 1)
 		{
-			float max = getresmax();
+			float max = getResMax();
+			float min = getResMin();
 
 			RECT pan1rect;
 			GetClientRect(panel1, &pan1rect);
@@ -184,7 +195,7 @@ LRESULT CALLBACK winproc(HWND hwnd, UINT wm, WPARAM wp,	LPARAM lp)
 			for (int i = 0; i < results.size(); i++)
 			{
 				int cx = (pan1w / n)*i;
-				int cy = trunc((pan1h/max)*(results[i]));
+				int cy = trunc((pan1h/(max-min))*(results[i]-min));
 				rpoints[i].x = cx;
 				rpoints[i].y = pan1h - cy;
 			}
