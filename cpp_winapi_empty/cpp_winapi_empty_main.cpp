@@ -7,7 +7,7 @@
 #define BUTTON1 102
 #define EDIT2 103
 #define EDIT3 104
-#define PANEL1 104
+#define PANEL1 105
 
 //our window class name
 const TCHAR CLSNAME[] = TEXT("ourWinClass");
